@@ -1,0 +1,4 @@
+std_msgs/Header header
+float32 scan_start_timestamp
+uint16 number_of_objects
+ObjectLuxRos[] object_list

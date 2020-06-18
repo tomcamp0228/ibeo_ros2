@@ -1,0 +1,13 @@
+<launch>
+
+  <arg name="device_ip" default="192.168.1.16" />
+  <arg name="device_port" default="12002" />
+
+  <node name="ibeo_live_default" pkg="ibeo_8l_client" type="ibeo_live" output="screen">
+	<param name = "device_ip" type="string" value ="$(arg device_ip)" />
+  <param name = "device_port" type="int" value ="$(arg device_port)" />
+  </node>
+  <node name="obj_visualization" pkg="ibeo_8l_client" type="obj_visualization" output="screen"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ibeo_8l_client)/rviz/default.rviz"/>
+
+</launch>

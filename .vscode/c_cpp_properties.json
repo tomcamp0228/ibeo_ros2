@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/tom/ibeo_ws/src/ibeo_8l_msgs/include/**",
+                "/opt/ros/eloquent/include/**",
+                "/usr/include/**",
+                "${workspaceFolder}/src/ibeo_8l_sdk/src/**",
+                "/opt/ros/dashing/include/**",
+                "${workspaceFolder}/install/ibeo_8l_msgs/share/ibeo_8l_msgs/include/**",
+                "${workspaceFolder}/install/ibeo_8l_msgs/include"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}
