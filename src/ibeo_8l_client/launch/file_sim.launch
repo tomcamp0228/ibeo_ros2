@@ -1,9 +1,0 @@
-<launch>
-
-  <arg name="idc_file" default="$(find ibeo_8l_client)/record/20190320-085450.idc"/>
-  <node name="ibeo_file_sim_default" pkg="ibeo_8l_client" type="ibeo_file_sim" output="screen">
-	<param name = "idc_file" type="string" value ="$(arg idc_file)" />
-  </node>
-  <node name="obj_visualization" pkg="ibeo_8l_client" type="obj_visualization" output="screen"/>
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ibeo_8l_client)/rviz/default.rviz"/>
-</launch>

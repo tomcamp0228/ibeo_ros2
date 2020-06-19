@@ -43,21 +43,38 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Class: rviz_default_plugins/MarkerArray
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
       Enabled: true
-      Name: MarkerArray
-      Namespaces:
-        Car: true
-        Pedestrian: true
-        Truck: true
-        Unknown Big: true
-        Unknown Small: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 2.359999895095825
+      Min Color: 0; 0; 0
+      Min Intensity: 0.03999999910593033
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.10000000149011612
+      Style: Flat Squares
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /ibeo_objects_vis
+        Value: /ibeo_8l_client/ibeo_scan_up
+      Use Fixed Frame: true
+      Use rainbow: true
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -76,7 +93,7 @@ Visualization Manager:
       Max Color: 255; 255; 255
       Max Intensity: 4.239999771118164
       Min Color: 0; 0; 0
-      Min Intensity: 0.07999999821186066
+      Min Intensity: 0.23999999463558197
       Name: PointCloud2
       Position Transformer: XYZ
       Selectable: true
@@ -88,42 +105,25 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /ibeo_scan_down
+        Value: /ibeo_8l_client/ibeo_scan_down
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
-    - Alpha: 1
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz_default_plugins/PointCloud2
-      Color: 255; 255; 255
-      Color Transformer: Intensity
-      Decay Time: 0
+    - Class: rviz_default_plugins/MarkerArray
       Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Max Intensity: 2.319999933242798
-      Min Color: 0; 0; 0
-      Min Intensity: 0.03999999910593033
-      Name: PointCloud2
-      Position Transformer: XYZ
-      Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.10000000149011612
-      Style: Flat Squares
+      Name: MarkerArray
+      Namespaces:
+        Car: true
+        Pedestrian: true
+        Truck: true
+        Unknown Big: true
+        Unknown Small: true
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /ibeo_scan_up
-      Use Fixed Frame: true
-      Use rainbow: true
+        Value: /ibeo_8l_client/ibeo_objects_vis
       Value: true
   Enabled: true
   Global Options:
@@ -166,7 +166,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 54.73565673828125
+      Distance: 27.65576934814453
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -181,10 +181,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6503981351852417
+      Pitch: 0.665398120880127
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.5503952503204346
+      Yaw: 3.280399799346924
     Saved: ~
 Window Geometry:
   Displays:

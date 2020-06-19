@@ -1,4 +1,4 @@
-# Ibeo_ROS2 project
+# Ibeo ROS2 project
 
 This is a project original built for [Ibeo 8l LUX LiDAR](https://www.ibeo-as.com) in ROS2 environment, the project is fully functional under [ROS 2 Eloquent Elusor](https://index.ros.org/).
 Current project mainly has two functions:
@@ -6,7 +6,7 @@ Current project mainly has two functions:
 - Get point cloud from the device and broadcast to ROS2 network;
 - Read .idc file, which is a file format provided by Ibeo to record data under Windows system.
   
-**Before starting, check your Ibeo LiDAR IP address and port/you .idc location and adjust them in the `src/ibeo_8l_client/launch/para.yaml`**
+**Before starting, check your Ibeo LiDAR IP address and port/your .idc location and adjust them in the `src/ibeo_8l_client/config/para_live.yaml` (for live) OR `src/ibeo_8l_client/config/para_file_sim.yaml` (for file sim)**
 
 To briefly run the program, follow the instructions below:
 

@@ -9,9 +9,8 @@ from launch.actions import DeclareLaunchArgument
 
 
 def generate_launch_description():
-    
-    idc_file = os.path.join(get_package_share_directory('ibeo_8l_client'), 'record', '20190320-085450.idc')
-    rviz_config_dir=rviz_config_dir = os.path.join(get_package_share_directory('ibeo_8l_client'), 'config', 'ibeo_disp.rviz')
+    para_dir = os.path.join(get_package_share_directory('ibeo_8l_client'), 'config', 'para_file_sim.yaml')
+    rviz_config_dir = os.path.join(get_package_share_directory('ibeo_8l_client'), 'config', 'default.rviz')
     
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -23,8 +22,9 @@ def generate_launch_description():
             package='ibeo_8l_client',
             node_namespace='ibeo_8l_client',
             node_executable='ibeo_file_sim',
-            node_name=[launch.substitutions.LaunchConfiguration('node_prefix'), 'ibeo_file_sim'],
-            parameters=None,
+            # node_name=[launch.substitutions.LaunchConfiguration('node_prefix'), 'ibeo_file_sim'],
+            node_name='ibeo_file_sim',
+            parameters=[para_dir],
             remappings=None,
             arguments=None,
             output='screen',
@@ -33,9 +33,10 @@ def generate_launch_description():
             package='ibeo_8l_client',
             node_namespace='ibeo_8l_client',
             node_executable='obj_visualization',
-            node_name=[LaunchConfiguration(
-                "node_prefix"), 'obj_visualization'],
-            parameters=None,
+            # node_name=[LaunchConfiguration("node_prefix"), 'obj_visualization'],
+            node_name='obj_visualization',
+            parameters=[para_dir],
+            # parameters=None,
             remappings=None,
             arguments=None,
             output='screen',

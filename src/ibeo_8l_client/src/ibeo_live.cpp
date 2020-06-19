@@ -132,7 +132,7 @@ public:
 		input_stream<<scan->getSerializedSize()<<" Bytes ScanEcu recieved: # "<<scan->getScanNumber()<<" #Pts: "<<scan->getNumberOfScanPoints()<<" ScanStart "<<tc.toString(scan->getStartTimestamp().toPtime(), 3);
 		
 		RCLCPP_INFO(node_logger,input_stream.str());
-		// RCLCPP_INFO(node->get_logger(),"%s Bytes ScanEcu recieved: # %d #Pts: %d ScanStart %s"
+		// RCLCPP_INFO(node->get_logger(),"%s Bytes ScanEcu received: # %d #Pts: %d ScanStart %s"
 		// 								,scan->getSerializedSize(),scan->getScanNumber(),scan->getNumberOfScanPoints(),tc.toString(scan->getStartTimestamp().toPtime(), 3));
 	}
 
@@ -214,7 +214,7 @@ public:
 
 		object_pub->publish(obj_list);
 		std::stringstream input_stream;
-		input_stream<<objList->getSerializedSize()<<" Bytes ObjectListEcu recieved: # "<<objList->getNumberOfObjects()<<" Time stamp: "<<tc.toString(objList->getScanStartTimestamp().toPtime(), 3);
+		input_stream<<objList->getSerializedSize()<<" Bytes ObjectListEcu received: # "<<objList->getNumberOfObjects()<<" Time stamp: "<<tc.toString(objList->getScanStartTimestamp().toPtime(), 3);
 		RCLCPP_INFO(node_logger,input_stream.str());
 	}
 
@@ -258,18 +258,26 @@ int main(int argc, char** argv)
 {
 	rclcpp::init(argc, argv);
 	auto luxListener=std::make_shared<IbeoLuxListener>();
-	rclcpp::executors::SingleThreadedExecutor excutor;
 	
 	// auto nh=luxListener.make_shared();
 	std::string ip;
-	int port;
+	int port=0;
 	// luxListener.get_parameter<std::string>("device_ip", ip);
 	// luxListener.get_parameter<int>("device_port",port);
-	ip="192.168.1.16";
-	port=12002;
+	// ip="192.168.2.16";
+	// port=12002;
+	luxListener->declare_parameter("ip","");
+	luxListener->declare_parameter("port",0);
+	luxListener->get_parameter<std::string>("ip",ip);
+	luxListener->get_parameter<int>("port",port);
 
 	if(ip == ""){
 		RCLCPP_ERROR(luxListener->get_logger(),"Invalid IP!\n");
+		exit(0);
+	}
+
+	if(port==0){
+		RCLCPP_ERROR(luxListener->get_logger(),"Invalid Port!\n");
 		exit(0);
 	}
 

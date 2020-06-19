@@ -177,7 +177,6 @@ void visualCallback(const ibeo_8l_msgs::msg::ObjectListLuxRos::SharedPtr objList
 		marker_box.pose.orientation.y = qn.y();
 		marker_box.pose.orientation.z = qn.z();
 		marker_box.pose.orientation.w = qn.w();
-		
 		marker_box.lifetime = rclcpp::Duration(0,170000000);
 		marker_box.color.a = 0.5;
 		marker_box.color.r = marker_box.color.g = marker_box.color.b = 1.0;
@@ -293,9 +292,11 @@ int main(int argc, char** argv)
 
 	std::string ibeo_object_topic; 
 
-	// np.param<std::string>("ibeo_object_topic", ibeo_object_topic, "/ibeo_objects");
-	//node->get_parameter<std::string>("ibeo_object_topic",ibeo_object_topic);
-	ibeo_object_topic="/ibeo_objects";
+	node->declare_parameter("ibeo_object_topic","/ibeo_8l_client/ibeo_objects");
+	node->get_parameter_or<std::string>("ibeo_object_topic",ibeo_object_topic,"/ibeo_8l_client/ibeo_objects");
+	// ibeo_object_topic="/ibeo_objects";
+
+	RCLCPP_ERROR(node->get_logger(),ibeo_object_topic);
 	// object_vis_pub = nh.advertise<visualization_msgs::MarkerArray> ("ibeo_objects_vis", 10);
 	// objectcpts_vis_pub = nh.advertise<visualization_msgs::MarkerArray> ("ibeo_objects_vis_cpts", 10);
 
@@ -303,7 +304,7 @@ int main(int argc, char** argv)
 	objectcpts_vis_pub=node->create_publisher<visualization_msgs::msg::MarkerArray>("ibeo_objects_vis_cpts",10);
 	// ros::Subscriber obj_sub = nh.subscribe(ibeo_object_topic, 10, visualCallback);
 	auto obj_sub=node->create_subscription<ibeo_8l_msgs::msg::ObjectListLuxRos>(ibeo_object_topic,100,visualCallback);
-
+	// RCLCPP_ERROR(node->get_logger(),"######################");
 	//ros::spin();
 	rclcpp::spin(node);
 	//RCLCPP_WARN(node->get_logger(),"Hi\n");

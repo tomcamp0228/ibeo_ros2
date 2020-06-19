@@ -12,6 +12,7 @@
                 "${workspaceFolder}/src/ibeo_8l_sdk/src/**",
                 "/opt/ros/dashing/include/**",
                 "${workspaceFolder}/install/ibeo_8l_msgs/share/ibeo_8l_msgs/include/**",
+                "${workspaceFolder}/install/ibeo_8l_msgs/include",
                 "${workspaceFolder}/install/ibeo_8l_msgs/include"
             ],
             "name": "ROS",

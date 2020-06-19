@@ -1,0 +1,9 @@
+ibeo_8l_client:
+  ibeo_live:
+    ros__parameters:
+      ip: "192.168.2.16"
+      port: 12002
+
+  obj_visualization:
+     ros__parameters:
+        ibeo_object_topic: "/ibeo_8l_client/ibeo_objects"

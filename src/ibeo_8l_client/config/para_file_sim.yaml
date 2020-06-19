@@ -1,0 +1,8 @@
+ibeo_8l_client:
+  ibeo_file_sim:
+    ros__parameters:
+      idc_file: "/home/tom/ibeo_ws/src/ibeo_8l_client/record/20190320-085450.idc"
+
+  obj_visualization:
+     ros__parameters:
+        ibeo_object_topic: "/ibeo_8l_client/ibeo_objects"

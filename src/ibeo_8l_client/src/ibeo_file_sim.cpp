@@ -73,23 +73,12 @@ public:
 		log_pub=this->create_publisher<std_msgs::msg::String>("log",1000);
 		cloud_pub_up=this->create_publisher<sensor_msgs::msg::PointCloud2> ("ibeo_scan_up", 2);
 		cloud_pub_down=this->create_publisher<sensor_msgs::msg::PointCloud2> ("ibeo_scan_down", 2);
-		object_pub=this->create_publisher<ibeo_8l_msgs::msg::ObjectListLuxRos>("ibeo_objects",10);
+		object_pub=this->create_publisher<ibeo_8l_msgs::msg::ObjectListLuxRos>("ibeo_objects",2);
 		firstscan=true;
 	}
 	virtual ~FileTopicConverter() {}
 
 	
-	void initPublisher(){
-		// log_pub=node->create_publisher<std_msgs::msg::String>("log",1000);
-		// cloud_pub_up=node->create_publisher<pcl::PointCloud<pcl::PointXYZI>> ("ibeo_scan_up", 2);
-		// cloud_pub_down=node->create_publisher<pcl::PointCloud<pcl::PointXYZI>> ("ibeo_scan_down", 2);
-		// cloud_pub_up=node->create_publisher<sensor_msgs::msg::PointCloud2> ("ibeo_scan_up", 2);
-		// cloud_pub_down=node->create_publisher<sensor_msgs::msg::PointCloud2> ("ibeo_scan_down", 2);
-		// object_pub=node->create_publisher<ibeo_8l_msgs::msg::ObjectListLuxRos>("ibeo_objects",10);
-
-		// firstscan = true;
-	}
-
 public:
 	//Data callback functions, will be called when receiving messages.
 	void onData(const ScanEcu* const scan)
@@ -129,7 +118,7 @@ public:
 		}
 		
 		std::stringstream input_stream;
-		input_stream<<scan->getSerializedSize()<<" Bytes ScanEcu recieved: # "<<scan->getScanNumber()<<" #Pts: "<<scan->getNumberOfScanPoints()<<" ScanStart "<<tc.toString(scan->getStartTimestamp().toPtime(), 3);
+		input_stream<<scan->getSerializedSize()<<" Bytes ScanEcu received: # "<<scan->getScanNumber()<<" #Pts: "<<scan->getNumberOfScanPoints()<<" ScanStart "<<tc.toString(scan->getStartTimestamp().toPtime(), 3);
 		
 		RCLCPP_INFO(node_logger,input_stream.str());
 	}
@@ -205,7 +194,7 @@ public:
 
 		object_pub->publish(obj_list);
 		std::stringstream input_stream;
-		input_stream<<objList->getSerializedSize()<<" Bytes ObjectListEcu recieved: # "<<objList->getNumberOfObjects()<<" Time stamp: "<<tc.toString(objList->getTimestamp().toPtime(), 3);
+		input_stream<<objList->getSerializedSize()<<" Bytes ObjectListEcu received: # "<<objList->getNumberOfObjects()<<" Time stamp: "<<tc.toString(objList->getTimestamp().toPtime(), 3);
 		RCLCPP_INFO(node_logger,input_stream.str());
 	}
 
@@ -277,8 +266,10 @@ int main(int argc, char** argv)
 	auto converter=std::make_shared<FileTopicConverter>();
 	//FileTopicConverter converter;
 	std::string filename;
-	//converter.get_parameter<std::string>("idc_file",filename);
-	filename="/home/tom/ibeo_ws/src/ibeo_8l_client/record/20190320-085450.idc";
+
+	converter->declare_parameter("idc_file","/home/tom/ibeo_ws/src/ibeo_8l_client/record/20190320-085450.idc");
+	converter->get_parameter_or<std::string>("idc_file",filename,"/home/tom/ibeo_ws/src/ibeo_8l_client/record/20190320-085450.idc");
+	// filename="/home/tom/ibeo_ws/src/ibeo_8l_client/record/20190320-085450.idc";
 	
 	
 	if(filename == ""){
