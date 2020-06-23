@@ -1,0 +1,14 @@
+<launch>
+
+
+
+  <node name="obj_visualization" pkg="ibeo_8l_client" type="obj_visualization">
+	  <param name = "ibeo_object_topic" type="string" value ="/ibeo_objects_retrack" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find object_tracker)/rviz/track_live.rviz"/>
+  
+  <node name="object_tracker" pkg="object_tracker" type="object_tracker" />
+
+  <node name="ped_rec" pkg="ped_rec" type="ped_rec" output="screen"/>
+</launch>

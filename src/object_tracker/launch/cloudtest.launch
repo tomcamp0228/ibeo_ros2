@@ -1,0 +1,14 @@
+<launch>
+
+  <param name="/cloud_extraction/search_radius" type="double" value="0.5" />
+  <param name="/cloud_extraction/min_size" type="int" value="20" />
+  <param name="/cloud_extraction/max_size" type="int" value="800" />
+
+  <arg name="idc_file" default="$(find ibeo_8l_client)/record/20190320-085450.idc"/>
+  <node name="ibeo_file_sim_default" pkg="ibeo_8l_client" type="ibeo_file_sim" output="screen">
+	<param name = "idc_file" type="string" value ="$(arg idc_file)" />
+  </node>
+  <node name="cloud_extration" pkg="object_tracker" type="cloud_extraction" output="screen"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find object_tracker)/rviz/cloudtest.rviz"/>
+
+</launch>

@@ -13,7 +13,8 @@
                 "/opt/ros/dashing/include/**",
                 "${workspaceFolder}/install/ibeo_8l_msgs/share/ibeo_8l_msgs/include/**",
                 "${workspaceFolder}/install/ibeo_8l_msgs/include",
-                "${workspaceFolder}/install/ibeo_8l_msgs/include"
+                "${workspaceFolder}/install/ibeo_8l_msgs/include",
+                "${workspaceFolder}/src/object_tracker/include"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",

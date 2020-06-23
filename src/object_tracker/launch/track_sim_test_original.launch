@@ -1,0 +1,22 @@
+<launch>
+
+  <arg name="idc_file" default="$(find ibeo_8l_client)/record/20190320-085450.idc"/>
+  <node name="ibeo_file_sim_default" pkg="ibeo_8l_client" type="ibeo_file_sim" output="screen">
+	  <param name = "idc_file" type="string" value ="$(arg idc_file)" />
+  </node>
+ 
+ <node pkg="rosbag" type="play" name="playe" output="screen" args="--clock /home/tom/autoware_demo/sample_moriyama_150324.bag">
+    <param name = "-rate" type="double" value ="0.1" />
+  </node>
+
+
+  <node name="obj_visualization" pkg="ibeo_8l_client" type="obj_visualization">
+	  <param name = "ibeo_object_topic" type="string" value ="/ibeo_objects_retrack" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find object_tracker)/rviz/track_test.rviz"/>
+  
+  <node name="object_tracker" pkg="object_tracker" type="object_tracker" output="screen"/>
+
+  
+</launch>

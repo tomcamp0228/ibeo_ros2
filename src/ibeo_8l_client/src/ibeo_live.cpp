@@ -152,7 +152,7 @@ public:
 
 			obj_ros.id = objs[i].getObjectId();
 			obj_ros.age = objs[i].getObjectAge();
-			obj_ros.timestamp = float(this->get_clock()->now().seconds());
+			obj_ros.timestamp = this->get_clock()->now();
 
 			obj_ros.classification = objs[i].getClassification();
 			obj_ros.classification_certainty = objs[i].getClassificationCertainty();

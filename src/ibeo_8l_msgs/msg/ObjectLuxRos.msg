@@ -1,6 +1,6 @@
 uint16 id
 uint32 age
-float32 timestamp
+builtin_interfaces/Time timestamp
 #TODO: how to use time in ros2
 uint8 classification
 uint8 classification_certainty

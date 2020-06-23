@@ -36,7 +36,7 @@ find_package(ibeo_8l_sdk REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(PCL REQUIRED) #  COMPONENTS common io
 find_package(Boost REQUIRED COMPONENTS system chrono regex thread program_options date_time)
-find_package(sensor_msgs)
+find_package(sensor_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(pcl_msgs REQUIRED)

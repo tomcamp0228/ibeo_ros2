@@ -125,7 +125,7 @@ visualization_msgs::msg::Marker createContourFrameMarker(const std::vector<ibeo_
 	marker.pose.orientation.z = 0;
 	marker.pose.orientation.w = 0;
 	marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
-	marker.lifetime = rclcpp::Duration(0.1);
+	marker.lifetime = rclcpp::Duration(0,170000000);
 	marker.color.a = 0.5;
 	marker.color.r = 1.0; marker.color.g = marker.color.b = 0;
 	marker.frame_locked = false;

@@ -141,7 +141,7 @@ public:
 
 			obj_ros.id = objs[i].getObjectId();
 			obj_ros.age = objs[i].getObjectAge();
-			obj_ros.timestamp = this->get_clock()->now().nanoseconds();
+			obj_ros.timestamp = this->get_clock()->now();
 			//TODO: Is it correct?
 
 			obj_ros.classification = objs[i].getClassification();

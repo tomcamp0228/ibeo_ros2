@@ -1,0 +1,6 @@
+<launch>
+
+  <node name="vehicle_sim" pkg="rosbag" type="play" args="$(find vehicle_state_manager)/record/2019-04-04-12-24-55.bag"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find object_tracker)/rviz/bagplay.rviz"/>
+  <node name="reproducedata" pkg="object_tracker" type="test_listener" output="screen"/>
+</launch>
