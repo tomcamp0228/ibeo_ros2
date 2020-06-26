@@ -37,7 +37,7 @@ namespace object_tracker{
 
 
 double SEARCH_R = 1.2;// original 0.8
-int CLUSTER_SIZE_MIN = 4;// original 5
+int CLUSTER_SIZE_MIN = 10;// original 5
 int CLUSTER_SIZE_MAX = 800;// original 800
 
 

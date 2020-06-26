@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <math.h>
 #include <string.h>
+#include <sstream>
 #include <memory>
 
 //======================================================================
@@ -262,7 +263,7 @@ void visualCallback(const ibeo_8l_msgs::msg::ObjectListLuxRos::SharedPtr objList
 		marker_label.header.stamp = node->get_clock()->now();
 		marker_label.header.frame_id = objList -> header.frame_id;
 
-		//create contour points vislization msg
+		//create contour points visualization msg
 		if(objs[i].number_of_contour_points != 0){
 			const std::vector< ibeo_8l_msgs::msg::Point2Df > &contourpts = objs[i].contour_point_list;
 			visualization_msgs::msg::Marker marker_cpts = createContourFrameMarker(contourpts,node);
@@ -292,11 +293,11 @@ int main(int argc, char** argv)
 
 	std::string ibeo_object_topic; 
 
-	node->declare_parameter("ibeo_object_topic","/ibeo_8l_client/ibeo_objects");
+	node->declare_parameter("ibeo_object_topic","/object_tracker/ibeo_objects");
 	node->get_parameter_or<std::string>("ibeo_object_topic",ibeo_object_topic,"/ibeo_8l_client/ibeo_objects");
 	// ibeo_object_topic="/ibeo_objects";
 
-	RCLCPP_ERROR(node->get_logger(),ibeo_object_topic);
+	// RCLCPP_ERROR(node->get_logger(),ibeo_object_topic);
 	// object_vis_pub = nh.advertise<visualization_msgs::MarkerArray> ("ibeo_objects_vis", 10);
 	// objectcpts_vis_pub = nh.advertise<visualization_msgs::MarkerArray> ("ibeo_objects_vis_cpts", 10);
 
@@ -304,7 +305,9 @@ int main(int argc, char** argv)
 	objectcpts_vis_pub=node->create_publisher<visualization_msgs::msg::MarkerArray>("ibeo_objects_vis_cpts",10);
 	// ros::Subscriber obj_sub = nh.subscribe(ibeo_object_topic, 10, visualCallback);
 	auto obj_sub=node->create_subscription<ibeo_8l_msgs::msg::ObjectListLuxRos>(ibeo_object_topic,100,visualCallback);
-	// RCLCPP_ERROR(node->get_logger(),"######################");
+	std::stringstream topic_notification;
+	topic_notification<<"Subscribing to: "<<ibeo_object_topic;
+	RCLCPP_ERROR(node->get_logger(),topic_notification.str());
 	//ros::spin();
 	rclcpp::spin(node);
 	//RCLCPP_WARN(node->get_logger(),"Hi\n");

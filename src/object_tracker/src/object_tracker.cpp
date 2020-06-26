@@ -36,6 +36,7 @@ class Object_Tracker :public rclcpp::Node
     uint id_front = 0;
     uint related_observation_count;
     uint related_observation[40];
+    std::string scan_cloud_topic,odom_sub_topic;
 
     bool is_odom_received = false;
     bool is_using_world_frame = false;
@@ -44,10 +45,15 @@ class Object_Tracker :public rclcpp::Node
     Object_Tracker():
     Node("object_tracker")
     {
+        //由于namespace的特性，Subscribe的消息名前需加入/namespace/topic,是否引入parameter加以定义？
+        this->declare_parameter<std::string>("scan_cloud_topic","/ibeo_scan_up");
+        this->declare_parameter<std::string>("odom_sub_topic","/vehicle_odom");
+        this->get_parameter_or<std::string>("scan_cloud_topic",scan_cloud_topic,"/ibeo_scan_up");
+        this->get_parameter_or<std::string>("odom_sub_topic",odom_sub_topic,"/vehicle_odom");
         ibeo_msg_pub=this->create_publisher<ibeo_8l_msgs::msg::ObjectListLuxRos>("ibeo_objects_retrack",10);
         box_pub=this->create_publisher<visualization_msgs::msg::MarkerArray>("extraction",10);
-        scancloud=this->create_subscription<sensor_msgs::msg::PointCloud2>("ibeo_scan_up",10,std::bind(&Object_Tracker::lidarProcess,this,std::placeholders::_1));
-        odomsub=this->create_subscription<nav_msgs::msg::Odometry>("ibeo_scan_up",10,std::bind(&Object_Tracker::odomReceive,this,std::placeholders::_1));
+        scancloud=this->create_subscription<sensor_msgs::msg::PointCloud2>(scan_cloud_topic,10,std::bind(&Object_Tracker::lidarProcess,this,std::placeholders::_1));
+        odomsub=this->create_subscription<nav_msgs::msg::Odometry>(odom_sub_topic,10,std::bind(&Object_Tracker::odomReceive,this,std::placeholders::_1));
     }
 
     void odomReceive(const nav_msgs::msg::Odometry::SharedPtr msg){
