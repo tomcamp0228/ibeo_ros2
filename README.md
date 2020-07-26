@@ -16,4 +16,8 @@ To briefly run the program, follow the instructions below:
   4. `source install/setup.bash`
   5. `ros2 launch ibeo_8l_client live.launch.py` (for live) **OR** `ros2 launch ibeo_8l_client file_sim.launch.py` (for .idc file)
 
+**To build Velodyne project, you are supposed to install following packages:**
+`sudo apt-get install libpcap-dev`
+`sudo apt-get install ros-eloquent-diagnostic-updater`
+
 Thanks to my teammates in graduation project and teammates in our group.

@@ -5,6 +5,7 @@ log/
 build/
 bin/
 lib/
+record/
 msg_gen/
 srv_gen/
 msg/*Action.msg
@@ -30,6 +31,7 @@ src/ibeo_8l_client/record/
 *.idc
 #Ignore ROSbag
 *.bag
+*.db3
 #Ignore Zip file
 *.zip
 # eclipse stuff

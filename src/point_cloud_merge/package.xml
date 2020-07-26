@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>point_cloud_merge</name>
+  <version>0.0.0</version>
+  <description>Merge Point cloud data</description>
+  <maintainer email="gpg9@live.com">tom</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_camke</buildtool_depend>
+  <!-- <depend>ibeo_8l_sdk</depend> -->
+  <build_depend>ibeo_8l_sdk</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+  <build_depend>pcl_conversions</build_depend>
+  <exec_depend>pcl_conversions</exec_depend>
+
+  <build_depend>ibeo_8l_msgs</build_depend>
+  <build_depend>libpcl-all-dev</build_depend>
+  <exec_depend>libpcl-all</exec_depend>
+  <exec_depend>ibeo_8l_msgs</exec_depend>
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

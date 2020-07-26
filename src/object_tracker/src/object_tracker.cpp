@@ -32,7 +32,7 @@ class Object_Tracker :public rclcpp::Node
     double vehicle_yaw=0;
     rclcpp::Time current_time;
     std::vector<object_tracker::ObjectBoxKalmanFilter> objects;
-    bool id_occupacy[1000] = {};
+    bool id_occupancy[1000] = {};
     uint id_front = 0;
     uint related_observation_count;
     uint related_observation[40];
@@ -45,7 +45,7 @@ class Object_Tracker :public rclcpp::Node
     Object_Tracker():
     Node("object_tracker")
     {
-        //由于namespace的特性，Subscribe的消息名前需加入/namespace/topic,是否引入parameter加以定义？
+        //由于namespace的特性，Subscribe的消息名前需加入/namespace/topic,引入parameter加以定义.
         this->declare_parameter<std::string>("scan_cloud_topic","/ibeo_scan_up");
         this->declare_parameter<std::string>("odom_sub_topic","/vehicle_odom");
         this->get_parameter_or<std::string>("scan_cloud_topic",scan_cloud_topic,"/ibeo_scan_up");
@@ -296,7 +296,6 @@ class Object_Tracker :public rclcpp::Node
         }
         else
             current_time = this->get_clock()->now();
-
         //using contour points
         for(i = 0; i < object_n; i ++){
             
