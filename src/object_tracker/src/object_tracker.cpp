@@ -9,6 +9,8 @@
 #include <object_tracker/object_box_kalman_filter.h>
 #include <ibeo_8l_msgs/msg/object_list_lux_ros.hpp>
 #include <pcl_conversions/pcl_conversions.h>
+
+#include <pcl/filters/passthrough.h>
 // #include <visual_detect/VisualResult.h>
 
 using namespace std;
@@ -18,12 +20,13 @@ using namespace std;
 #define ASSOCIATION_DISTANCE_THRESHOLD (2.5)//original2.0
 #define UPDATE_DISTANCE_THRESHOLD (2.0)//original1.5
 #define IBEO_VEHICLE_POSITION (0)//original 1.6
-string USING_FRAME = "vehicle";
+string USING_FRAME = "base_link";
 class Object_Tracker :public rclcpp::Node
 {
     private:
     rclcpp::Publisher<ibeo_8l_msgs::msg::ObjectListLuxRos>::SharedPtr ibeo_msg_pub;
     rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr box_pub;
+    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr filtered_cloud_pub;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr scancloud;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomsub;
 
@@ -46,14 +49,16 @@ class Object_Tracker :public rclcpp::Node
     Node("object_tracker")
     {
         //由于namespace的特性，Subscribe的消息名前需加入/namespace/topic,引入parameter加以定义.
-        this->declare_parameter<std::string>("scan_cloud_topic","/ibeo_scan_up");
+        this->declare_parameter<std::string>("scan_cloud_topic","/velodyne_points");
         this->declare_parameter<std::string>("odom_sub_topic","/vehicle_odom");
-        this->get_parameter_or<std::string>("scan_cloud_topic",scan_cloud_topic,"/ibeo_scan_up");
+        this->get_parameter_or<std::string>("scan_cloud_topic",scan_cloud_topic,"/velodyne_points");
         this->get_parameter_or<std::string>("odom_sub_topic",odom_sub_topic,"/vehicle_odom");
         ibeo_msg_pub=this->create_publisher<ibeo_8l_msgs::msg::ObjectListLuxRos>("ibeo_objects_retrack",10);
         box_pub=this->create_publisher<visualization_msgs::msg::MarkerArray>("extraction",10);
+        filtered_cloud_pub=this->create_publisher<sensor_msgs::msg::PointCloud2>("filtered_cloud",10);
         scancloud=this->create_subscription<sensor_msgs::msg::PointCloud2>(scan_cloud_topic,10,std::bind(&Object_Tracker::lidarProcess,this,std::placeholders::_1));
         odomsub=this->create_subscription<nav_msgs::msg::Odometry>(odom_sub_topic,10,std::bind(&Object_Tracker::odomReceive,this,std::placeholders::_1));
+        RCLCPP_WARN(this->get_logger(),"We received cloud topic name, %s",scan_cloud_topic.c_str());
     }
 
     void odomReceive(const nav_msgs::msg::Odometry::SharedPtr msg){
@@ -209,7 +214,7 @@ class Object_Tracker :public rclcpp::Node
     void boxPublisher(){
         
         visualization_msgs::msg::MarkerArray box_marker_list;
-        uint i;
+        uint i = 0;
 
         for(std::vector<object_tracker::PCLExtractBox>::const_iterator it = observations.begin (); it != observations.end (); ++it){
 
@@ -273,9 +278,74 @@ class Object_Tracker :public rclcpp::Node
     }
 
     void lidarProcess(const sensor_msgs::msg::PointCloud2::SharedPtr msg){
+        RCLCPP_INFO(this->get_logger(),"New point cloud received!!!!!!!");
         pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZI>);
+        
         pcl::fromROSMsg(*msg,*pcl_cloud);
-        observations = object_tracker::extractBox(pcl_cloud);
+
+        //Transform the point cloud into base link
+        //ros2 run tf2_ros static_transform_publisher 0 0 1.4 -1.57075 0 0 base_link velodyne
+        Eigen::Matrix4f transform_1 = Eigen::Matrix4f::Identity();
+        transform_1(2,3)=1.4;
+        float theta = -M_PI_2;
+        transform_1 (0,0) = cos (theta);
+        transform_1 (0,1) = -sin(theta);
+        transform_1 (1,0) = sin (theta);
+        transform_1 (1,1) = cos (theta);
+
+        pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_transformed(new pcl::PointCloud<pcl::PointXYZI>);
+        pcl::transformPointCloud(*pcl_cloud,*pcl_cloud_transformed,transform_1);
+        RCLCPP_INFO(this->get_logger(),"00The size of point cloud is %i",pcl_cloud_transformed->points.size());
+        pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_transformed_filtered_1(new pcl::PointCloud<pcl::PointXYZI>);
+        pcl::PassThrough<pcl::PointXYZI> pass_z, pass_i;
+        pass_z.setInputCloud(pcl_cloud_transformed);
+        pass_z.setFilterFieldName("z");
+        pass_z.setFilterLimits(0.2,2.5);
+        pass_z.setFilterLimitsNegative(false);
+        pass_z.filter(*pcl_cloud_transformed_filtered_1);
+        
+        RCLCPP_INFO(this->get_logger(),"11The size of point cloud is %i",pcl_cloud_transformed_filtered_1->points.size());
+        pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_transformed_filtered_2(new pcl::PointCloud<pcl::PointXYZI>);
+        pass_i.setInputCloud(pcl_cloud_transformed_filtered_1);
+        pass_i.setFilterFieldName("intensity");
+        pass_i.setFilterLimits(0,FLT_MAX);
+        pass_i.setFilterLimitsNegative(false);
+        pass_i.filter(*pcl_cloud_transformed_filtered_2);
+        RCLCPP_INFO(this->get_logger(),"22The size of point cloud is %i",pcl_cloud_transformed_filtered_2->points.size());
+        // RCLCPP_INFO(this->get_logger(),"Using frame %s",pcl_cloud_transformed_filtered_2->header.frame_id.c_str());
+        // pcl::VoxelGrid<pcl::PointCloud<pcl::PointXYZI>> sor;
+        pcl_cloud_transformed_filtered_2->header.frame_id.empty();
+        pcl_cloud_transformed_filtered_2->header.frame_id=USING_FRAME;
+        sensor_msgs::msg::PointCloud2::SharedPtr pc2_ptr(new(sensor_msgs::msg::PointCloud2));
+        // pc2_ptr->header.frame_id=USING_FRAME;
+        // pc2_ptr->height=1;
+        // pc2_ptr->is_dense=false;
+        // RCLCPP_INFO(this->get_logger(),"SET");
+        pcl::toROSMsg(*pcl_cloud_transformed_filtered_2,*pc2_ptr);
+        RCLCPP_INFO(this->get_logger(),"SET");
+        filtered_cloud_pub->publish(*pc2_ptr);
+        // RCLCPP_INFO(this->get_logger(),"Cut!!!!!!!");
+
+        // pcl::PointCloud<pcl::PointXYZI>::iterator iter = pcl_cloud->begin();
+        // while (iter!=pcl_cloud->end()){
+        //     float x, y, z ,i;
+        //     x = iter->x;
+        //     y = iter->y;
+        //     z = iter->z;
+        //     i = iter->intensity;
+        //     // RCLCPP_INFO(this->get_logger(),"x: %d ,y: %d ,z: %d ,i: %d ",x,y,z,i);
+        //     if (!pcl_isfinite(x) || !pcl_isfinite(y) || !pcl_isfinite(z) || !pcl_isfinite(i))
+        //     {
+        //         iter=pcl_cloud->erase(iter);
+        //     }
+        //     else
+        //     {
+        //         ++iter;
+        //     }
+            
+
+        // }
+        observations = object_tracker::extractBox(pcl_cloud_transformed_filtered_2);
         RCLCPP_INFO(this->get_logger(),"Extracted!");
 
         uint i, j, observation_n = observations.size(), object_n = objects.size();
@@ -582,7 +652,7 @@ class Object_Tracker :public rclcpp::Node
         //del old objects
         std::vector<object_tracker::ObjectBoxKalmanFilter>::iterator it = objects.begin();
         while(it != objects.end()){
-            if(it -> is_lost/*&& ((current_time - it -> lost_time) > ros::Duration(0.5))*/){
+            if(it -> is_lost && ((current_time - it -> lost_time) > rclcpp::Duration(0.05*1e9))){
                 it = objects.erase(it);
             }
             else ++it;

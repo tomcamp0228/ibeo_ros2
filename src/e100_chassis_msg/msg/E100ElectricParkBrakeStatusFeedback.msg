@@ -1,0 +1,8 @@
+int16 electric_park_brake_system_warning_indication_request 0
+int16 electric_park_brake_system_warning_indication_validity 0
+int16 epb_dynamic_braking 0
+int16 electric_park_brake_status_alive_rolling_count 0
+float32 epb_slope_ratio_signal 0
+int16 epb_slope_ratio_validity 0
+int16 electric_park_brake_status 0
+int16 electric_park_brake_status_check_sum 0

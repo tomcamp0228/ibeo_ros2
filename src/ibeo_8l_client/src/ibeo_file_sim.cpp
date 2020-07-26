@@ -36,7 +36,7 @@ using namespace ibeosdk;
 
 TimeConversion tc;
 
-#define SENSOR_FRAME "vehicle"
+#define SENSOR_FRAME "base_link"
 
 //======================================================================
 

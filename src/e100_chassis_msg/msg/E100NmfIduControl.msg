@@ -1,0 +1,1 @@
+bool initialize_continue_indication

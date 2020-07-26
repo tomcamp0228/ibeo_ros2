@@ -1,0 +1,10 @@
+ibeo_8l_client:
+  obj_visualization:
+     ros__parameters:
+        ibeo_object_topic: "/object_tracker/ibeo_objects_retrack"
+
+object_tracker:
+  object_tracker:
+    ros__parameters:
+      scan_cloud_topic: "/velodyne_points"
+      odom_sub_topic: "/ibeo_8l_client/vehicle_odom"

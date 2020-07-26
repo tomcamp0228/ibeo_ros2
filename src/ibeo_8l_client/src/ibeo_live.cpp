@@ -41,7 +41,7 @@ using namespace ibeosdk;
 
 TimeConversion tc;
 
-#define SENSOR_FRAME "vehicle"
+#define SENSOR_FRAME "base_link"
 
 //======================================================================
 
@@ -129,7 +129,7 @@ public:
 		else
 		 	cloud_pub_down->publish(*map_msg_ptr);
 		std::stringstream input_stream;
-		input_stream<<scan->getSerializedSize()<<" Bytes ScanEcu recieved: # "<<scan->getScanNumber()<<" #Pts: "<<scan->getNumberOfScanPoints()<<" ScanStart "<<tc.toString(scan->getStartTimestamp().toPtime(), 3);
+		input_stream<<scan->getSerializedSize()<<" Bytes ScanEcu received: # "<<scan->getScanNumber()<<" #Pts: "<<scan->getNumberOfScanPoints()<<" ScanStart "<<tc.toString(scan->getStartTimestamp().toPtime(), 3);
 		
 		RCLCPP_INFO(node_logger,input_stream.str());
 		// RCLCPP_INFO(node->get_logger(),"%s Bytes ScanEcu received: # %d #Pts: %d ScanStart %s"

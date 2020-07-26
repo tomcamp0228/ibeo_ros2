@@ -1,0 +1,7 @@
+int16 ebs_driving_mode 0
+int16 idu_request_status 0
+float32 ebs_master_cylinder_brake_pressure 0
+float32 brake_pedal_displacement 0
+int16 ebs_general_status_1_rolling_counter 0
+int16 ebs_general_status_1_check_sum 0
+int16 bbw_function_status 0
