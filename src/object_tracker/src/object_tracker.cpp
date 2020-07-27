@@ -21,6 +21,10 @@ using namespace std;
 #define UPDATE_DISTANCE_THRESHOLD (2.0)//original1.5
 #define IBEO_VEHICLE_POSITION (0)//original 1.6
 string USING_FRAME = "base_link";
+
+
+
+
 class Object_Tracker :public rclcpp::Node
 {
     private:
@@ -32,6 +36,8 @@ class Object_Tracker :public rclcpp::Node
 
     std::vector<object_tracker::PCLExtractBox> observations;
     nav_msgs::msg::Odometry odom;
+
+    Eigen::Matrix4f transform_1;
     double vehicle_yaw=0;
     rclcpp::Time current_time;
     std::vector<object_tracker::ObjectBoxKalmanFilter> objects;
@@ -59,6 +65,17 @@ class Object_Tracker :public rclcpp::Node
         scancloud=this->create_subscription<sensor_msgs::msg::PointCloud2>(scan_cloud_topic,10,std::bind(&Object_Tracker::lidarProcess,this,std::placeholders::_1));
         odomsub=this->create_subscription<nav_msgs::msg::Odometry>(odom_sub_topic,10,std::bind(&Object_Tracker::odomReceive,this,std::placeholders::_1));
         RCLCPP_WARN(this->get_logger(),"We received cloud topic name, %s",scan_cloud_topic.c_str());
+
+        //Transform the point cloud into base link
+        //ros2 run tf2_ros static_transform_publisher 0 0 1.4 -1.57075 0 0 base_link velodyne
+        transform_1.setIdentity();
+        transform_1(2,3) = 1.4;
+        float theta = -M_PI_2;
+        theta = 0;
+        transform_1 (0,0) = cos (theta);
+        transform_1 (0,1) = -sin(theta);
+        transform_1 (1,0) = sin (theta);
+        transform_1 (1,1) = cos (theta);
     }
 
     void odomReceive(const nav_msgs::msg::Odometry::SharedPtr msg){
@@ -283,45 +300,20 @@ class Object_Tracker :public rclcpp::Node
         
         pcl::fromROSMsg(*msg,*pcl_cloud);
 
-        //Transform the point cloud into base link
-        //ros2 run tf2_ros static_transform_publisher 0 0 1.4 -1.57075 0 0 base_link velodyne
-        Eigen::Matrix4f transform_1 = Eigen::Matrix4f::Identity();
-        transform_1(2,3)=1.4;
-        float theta = -M_PI_2;
-        transform_1 (0,0) = cos (theta);
-        transform_1 (0,1) = -sin(theta);
-        transform_1 (1,0) = sin (theta);
-        transform_1 (1,1) = cos (theta);
 
-        pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_transformed(new pcl::PointCloud<pcl::PointXYZI>);
-        pcl::transformPointCloud(*pcl_cloud,*pcl_cloud_transformed,transform_1);
-        RCLCPP_INFO(this->get_logger(),"00The size of point cloud is %i",pcl_cloud_transformed->points.size());
-        pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_transformed_filtered_1(new pcl::PointCloud<pcl::PointXYZI>);
-        pcl::PassThrough<pcl::PointXYZI> pass_z, pass_i;
-        pass_z.setInputCloud(pcl_cloud_transformed);
-        pass_z.setFilterFieldName("z");
-        pass_z.setFilterLimits(0.2,2.5);
-        pass_z.setFilterLimitsNegative(false);
-        pass_z.filter(*pcl_cloud_transformed_filtered_1);
-        
-        RCLCPP_INFO(this->get_logger(),"11The size of point cloud is %i",pcl_cloud_transformed_filtered_1->points.size());
-        pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_transformed_filtered_2(new pcl::PointCloud<pcl::PointXYZI>);
-        pass_i.setInputCloud(pcl_cloud_transformed_filtered_1);
-        pass_i.setFilterFieldName("intensity");
-        pass_i.setFilterLimits(0,FLT_MAX);
-        pass_i.setFilterLimitsNegative(false);
-        pass_i.filter(*pcl_cloud_transformed_filtered_2);
-        RCLCPP_INFO(this->get_logger(),"22The size of point cloud is %i",pcl_cloud_transformed_filtered_2->points.size());
+
+        pcl::PointCloud<pcl::PointXYZI>::Ptr pcl_cloud_transformed_filtered(new pcl::PointCloud<pcl::PointXYZI>);
+        pcl_cloud_transformed_filtered=object_tracker::filterCloud(pcl_cloud,transform_1);
         // RCLCPP_INFO(this->get_logger(),"Using frame %s",pcl_cloud_transformed_filtered_2->header.frame_id.c_str());
         // pcl::VoxelGrid<pcl::PointCloud<pcl::PointXYZI>> sor;
-        pcl_cloud_transformed_filtered_2->header.frame_id.empty();
-        pcl_cloud_transformed_filtered_2->header.frame_id=USING_FRAME;
+        pcl_cloud_transformed_filtered->header.frame_id.empty();
+        pcl_cloud_transformed_filtered->header.frame_id=USING_FRAME;
         sensor_msgs::msg::PointCloud2::SharedPtr pc2_ptr(new(sensor_msgs::msg::PointCloud2));
         // pc2_ptr->header.frame_id=USING_FRAME;
         // pc2_ptr->height=1;
         // pc2_ptr->is_dense=false;
         // RCLCPP_INFO(this->get_logger(),"SET");
-        pcl::toROSMsg(*pcl_cloud_transformed_filtered_2,*pc2_ptr);
+        pcl::toROSMsg(*pcl_cloud_transformed_filtered,*pc2_ptr);
         RCLCPP_INFO(this->get_logger(),"SET");
         filtered_cloud_pub->publish(*pc2_ptr);
         // RCLCPP_INFO(this->get_logger(),"Cut!!!!!!!");
@@ -345,7 +337,7 @@ class Object_Tracker :public rclcpp::Node
             
 
         // }
-        observations = object_tracker::extractBox(pcl_cloud_transformed_filtered_2);
+        observations = object_tracker::extractBox(pcl_cloud_transformed_filtered);
         RCLCPP_INFO(this->get_logger(),"Extracted!");
 
         uint i, j, observation_n = observations.size(), object_n = objects.size();
@@ -652,7 +644,7 @@ class Object_Tracker :public rclcpp::Node
         //del old objects
         std::vector<object_tracker::ObjectBoxKalmanFilter>::iterator it = objects.begin();
         while(it != objects.end()){
-            if(it -> is_lost && ((current_time - it -> lost_time) > rclcpp::Duration(0.05*1e9))){
+            if(it -> is_lost /*&& ((current_time - it -> lost_time) > rclcpp::Duration(0.05*1e9))*/){
                 it = objects.erase(it);
             }
             else ++it;
